@@ -1,0 +1,36 @@
+@name Mobility Core G6VG5
+@inputs RPM W S A D [L R]:array Base:entity
+@outputs Gear Throttle Length Constant Damping Left Right Power Weld #Smoke
+@persist MaxRPM Gears
+if(first()|dupefinished()){
+#stress = 300
+MaxRPM=4300
+Gears=6
+
+Length=0.1 Constant=20000 Damping=3000
+Base:propSetBuoyancy(-10)
+for(I=1,L:count()){L[I,entity]:propInertia(vec(12,10,12))}
+for(I=1,R:count()){R[I,entity]:propInertia(vec(12,10,12))}
+Gear=0 Throttle=10}
+
+
+
+interval(300)
+if(changed(RPM>(MaxRPM*0.9)) & RPM>(MaxRPM*0.9)){Gear=clamp(Gear+1,1,Gears-1) stoptimer("shift")}
+if((changed(RPM<MaxRPM/1.4)|changed(Gear)) & RPM<(MaxRPM/1.4)){Gear=clamp(Gear-1,1,Gears-1)}
+if(changed(Gear) & RPM>MaxRPM*0.95){timer("shift",500)}
+if(clk("shift") & RPM>MaxRPM*0.95){Gear=clamp(Gear+1,1,Gears)}
+if(changed(Gear)){entity():soundPlay(1,2,"acf_extra/vehiclefx/trans/default_shift.wav") soundVolume(1,0.1)}
+if(W+S+A+D!=0 & A+D!=2){Throttle=clamp(Throttle+(W+S+A+D)*2,15,100)
+}else{Throttle=clamp(Throttle-1,10,100)}
+if(S==1){Gear=Gears}
+if(changed(S+W)){Gear=1}
+if(changed(W+A+S+D)){
+Right=10-clamp(D*5+W+S-A*5,0,1)*10
+Left=10-clamp(A*5+W+S-D*5,0,1)*10
+if(L:count()!=0){if(A==1){Weld=0 L[1,entity]:weld(Base)}else{L[1,entity]:constraintBreak("weld")}}
+if(R:count()!=0){if(D==1){Weld=0 R[1,entity]:weld(Base)}else{R[1,entity]:constraintBreak("weld")}}
+if(changed(A+D==0) & A+D==0){Weld=1}else{Weld=0}
+}
+if(RPM<MaxRPM/1.4){Power=2}else{Power=1}
+
