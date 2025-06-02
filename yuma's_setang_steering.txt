@@ -1,0 +1,23 @@
+@name Yuma's SetAng Steering
+@inputs A D Base:entity 
+@persist E:entity [Speed Max Ang]
+@model models/sprops/rectangles_thin/size_1_5/rect_6x6x1_5.mdl
+#  SETANG STEERING 2,       
+#     
+if (first()||dupefinished()){Ang=0
+entity():setMass(50)
+Speed = 1
+Max = 30
+E = entity()
+timer("ss1",250)
+}
+interval(1000)
+if(clk("ss1")){
+    Ang=clamp((A-D)*Max,Ang-Speed,Ang+Speed)
+    E:setAng(Base:toWorld(ang(0,Ang,0))) #pitch yaw roll
+    timer("ss1",1)
+}
+if(E:isFrozen()==0){E:propFreeze(1)}
+
+
+if(changed(A+D)){Base:applyForce(vec(0,0,1))}

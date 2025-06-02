@@ -1,0 +1,12 @@
+@name Speedometer
+@inputs E:entity
+@outputs KMH KNOTS MPH MACH
+@persist Speed
+@trigger 
+
+interval(100)
+Speed=E:vel():length()*3.6/39.37
+KMH=Speed
+KNOTS=Speed*0.539957
+MPH=Speed*0.621504
+MACH=Speed*0.000834
